@@ -1,0 +1,22 @@
+# .NET build output
+bin/
+obj/
+artifacts/
+
+# IDE
+.vs/
+*.user
+.idea/
+
+__pycache__/
+*.pyc
+*.pyo
+*.log
+kubuntu-setup-*.log
+kubuntu-setup-*.summary
+.env
+*.env
+.secret
+*.secret
+.claude/settings.json
+.claude

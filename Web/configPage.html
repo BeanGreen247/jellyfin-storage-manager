@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Storage Manager — Configuration</title>
+    <style>
+        :root {
+            --bg:      #101010;
+            --surface: #1c1c1c;
+            --surface2:#2a2a2a;
+            --accent:  #00a4dc;
+            --text:    #e5e5e5;
+            --muted:   #888;
+            --border:  #3a3a3a;
+            --success: #4caf50;
+            --danger:  #f44336;
+            --radius:  8px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Noto Sans', 'Segoe UI', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 24px;
+        }
+        h2 { font-size: 1.3rem; margin-bottom: 6px; }
+        .subtitle { color: var(--muted); font-size: 0.875rem; margin-bottom: 28px; }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px 24px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--muted);
+            margin-bottom: 16px;
+        }
+
+        .form-group { margin-bottom: 18px; }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .form-group .hint {
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 9px 12px;
+            color: var(--text);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus { border-color: var(--accent); }
+
+        textarea { resize: vertical; min-height: 90px; font-family: monospace; }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .toggle-row:last-child { border-bottom: none; }
+
+        .toggle-label strong { display: block; font-size: 0.9rem; margin-bottom: 2px; }
+        .toggle-label span   { font-size: 0.78rem; color: var(--muted); }
+
+        input[type="checkbox"] {
+            width: 36px;
+            height: 20px;
+            appearance: none;
+            background: var(--border);
+            border-radius: 99px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+        input[type="checkbox"]:checked { background: var(--accent); }
+
+        input[type="checkbox"]::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            transition: left 0.2s;
+        }
+
+        input[type="checkbox"]:checked::after { left: 18px; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 20px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-primary:hover { opacity: 0.85; }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .alert.show    { display: block; }
+        .alert.success { background: rgba(76,175,80,0.15); border: 1px solid var(--success); color: #81c784; }
+        .alert.error   { background: rgba(244,67,54,0.15);  border: 1px solid var(--danger);  color: #ef9a9a; }
+
+        .detected-paths {
+            list-style: none;
+            margin-top: 8px;
+        }
+
+        .detected-paths li {
+            font-size: 0.8rem;
+            font-family: monospace;
+            color: var(--accent);
+            padding: 3px 0;
+        }
+
+        .detected-paths li::before { content: '✓  '; color: var(--success); }
+    </style>
+</head>
+<body>
+
+<h2>Storage Manager — Settings</h2>
+<p class="subtitle">Configure which drives are manageable and set security preferences.</p>
+
+<div id="page-alert" class="alert"></div>
+
+<!-- Auto-detected paths -->
+<div class="card">
+    <div class="card-title">Auto-detected Media Paths</div>
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">
+        These roots were detected from your Jellyfin library locations.
+        They will be treated as manageable media drives automatically.
+    </p>
+    <ul class="detected-paths" id="detected-list">
+        <li style="color:var(--muted)">Loading…</li>
+    </ul>
+</div>
+
+<!-- Options -->
+<div class="card">
+    <div class="card-title">Options</div>
+
+    <div class="toggle-row">
+        <div class="toggle-label">
+            <strong>Auto-detect media drive</strong>
+            <span>Use Jellyfin library paths to determine which drive is the media drive.</span>
+        </div>
+        <input type="checkbox" id="opt-autodetect" />
+    </div>
+
+    <div class="toggle-row">
+        <div class="toggle-label">
+            <strong>Require password before delete</strong>
+            <span>Admin must re-enter their password before any file or folder is permanently deleted.</span>
+        </div>
+        <input type="checkbox" id="opt-password" />
+    </div>
+
+    <div class="toggle-row">
+        <div class="toggle-label">
+            <strong>Show non-media drives</strong>
+            <span>Display OS and cache drives in the overview (read-only, not manageable).</span>
+        </div>
+        <input type="checkbox" id="opt-show-all" />
+    </div>
+</div>
+
+<!-- Manual overrides -->
+<div class="card">
+    <div class="card-title">Manual Drive Path Overrides</div>
+    <div class="form-group">
+        <label for="manual-paths">Additional manageable paths</label>
+        <textarea id="manual-paths" placeholder="/mnt/media&#10;/data/movies"></textarea>
+        <div class="hint">One path per line. These will be treated as manageable media drives in addition to (or instead of) auto-detected ones.</div>
+    </div>
+</div>
+
+<button class="btn btn-primary" onclick="saveConfig()">Save Settings</button>
+
+<script>
+function serverBase() {
+    if (typeof ApiClient !== 'undefined' && ApiClient.serverAddress)
+        return ApiClient.serverAddress().replace(/\/$/, '');
+    return window.location.origin;
+}
+
+function authHeaders() {
+    const h = { 'Content-Type': 'application/json' };
+    if (typeof ApiClient !== 'undefined' && ApiClient.accessToken)
+        h['Authorization'] = `MediaBrowser Token="${ApiClient.accessToken()}"`;
+    return h;
+}
+
+async function apiGet(path) {
+    const r = await fetch(serverBase() + path, { headers: authHeaders() });
+    if (!r.ok) throw new Error(await r.text() || r.statusText);
+    return r.json();
+}
+
+async function apiPost(path, body) {
+    const r = await fetch(serverBase() + path, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(body),
+    });
+    if (!r.ok) throw new Error(await r.text() || r.statusText);
+}
+
+function showAlert(type, msg) {
+    const el = document.getElementById('page-alert');
+    el.className = `alert ${type} show`;
+    el.textContent = msg;
+    setTimeout(() => { el.className = 'alert'; }, 5000);
+}
+
+async function loadConfig() {
+    try {
+        const cfg = await apiGet('/StorageManager/config');
+
+        document.getElementById('opt-autodetect').checked = cfg.autoDetectMediaDrive !== false;
+        document.getElementById('opt-password').checked   = cfg.requirePasswordForDelete !== false;
+        document.getElementById('opt-show-all').checked   = cfg.showNonMediaDrives !== false;
+
+        document.getElementById('manual-paths').value =
+            (cfg.mediaDrivePaths || []).join('\n');
+
+        const list = document.getElementById('detected-list');
+        if (cfg.detectedPaths && cfg.detectedPaths.length) {
+            list.innerHTML = cfg.detectedPaths
+                .map(p => `<li>${p}</li>`)
+                .join('');
+        } else {
+            list.innerHTML = '<li style="color:var(--muted)">No libraries found — add media libraries in Jellyfin first.</li>';
+        }
+    } catch (e) {
+        showAlert('error', 'Failed to load configuration: ' + e.message);
+    }
+}
+
+async function saveConfig() {
+    const paths = document.getElementById('manual-paths').value
+        .split('\n')
+        .map(s => s.trim())
+        .filter(Boolean);
+
+    try {
+        await apiPost('/StorageManager/config', {
+            mediaDrivePaths:        paths,
+            autoDetectMediaDrive:   document.getElementById('opt-autodetect').checked,
+            requirePasswordForDelete: document.getElementById('opt-password').checked,
+            showNonMediaDrives:     document.getElementById('opt-show-all').checked,
+        });
+        showAlert('success', 'Settings saved successfully.');
+    } catch (e) {
+        showAlert('error', 'Failed to save: ' + e.message);
+    }
+}
+
+loadConfig();
+</script>
+</body>
+</html>
