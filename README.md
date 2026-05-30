@@ -30,8 +30,8 @@ A Jellyfin server plugin that lets admins monitor disk usage and manage media dr
 
 | Component | Version |
 |---|---|
-| Jellyfin Server | 10.9.x |
-| .NET SDK | 8.0 (build only) |
+| Jellyfin Server | 10.11.x |
+| .NET SDK | 9.0 (build only) |
 | OS | Linux or Windows |
 
 ---
@@ -40,10 +40,10 @@ A Jellyfin server plugin that lets admins monitor disk usage and manage media dr
 
 ### Option A — Build and install locally (Jellyfin on this machine)
 
-**1. Install the .NET 8 SDK** if you do not have it:
+**1. Install the .NET 9 SDK** if you do not have it:
 
 ```bash
-curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 8.0
+curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 9.0
 echo 'export PATH="$HOME/.dotnet:$PATH"' >> ~/.bashrc && source ~/.bashrc
 ```
 
@@ -152,6 +152,64 @@ After the restart, **Storage Manager** appears in the admin sidebar.
 
 ---
 
+## Verifying the installation
+
+After restarting Jellyfin, use these checks to confirm the plugin loaded correctly.
+
+### 1. Check the Jellyfin logs (most reliable)
+
+```bash
+# systemd install
+sudo journalctl -u jellyfin -n 100 | grep -i "storage\|plugin\|error"
+
+# or via log file
+sudo tail -100 /var/log/jellyfin/jellyfin*.log | grep -i "storage\|plugin\|error"
+```
+
+A successful load shows:
+```
+[INF] Loaded plugin: Storage Manager 1.0.1
+```
+
+An error shows something like:
+```
+[ERR] Failed to load assembly ... MissingMethodException ...
+```
+
+### 2. Check Admin → Plugins → My Plugins
+
+The plugin should appear in the installed list with no warning icon.
+
+### 3. Check the sidebar
+
+**Storage Manager** should appear in the left sidebar under the Plugins section alongside any other installed plugins. Click it to open the storage overview.
+
+---
+
+## Troubleshooting
+
+**Plugin installs but does not appear in the sidebar**
+
+This almost always means the DLL failed to load at startup, usually due to a Jellyfin version mismatch. Check the logs (see above) for the exact error. Make sure you are running Jellyfin **10.11.x** — this plugin is not compatible with 10.9.x or 10.10.x.
+
+**"Only zip packages are supported" error in the logs**
+
+Jellyfin 10.11+ requires plugins to be distributed as `.zip` archives rather than bare `.dll` files. If you see this error, you are running an older release of this plugin. Uninstall it, then reinstall the latest version from the catalog — releases from v1.0.2 onwards are packaged correctly as zip archives.
+
+**"Storage Manager was installed" appears twice in Alerts**
+
+This just means it was installed more than once from the catalog. It is harmless — only one copy is active.
+
+**Delete confirmation returns "Invalid credentials"**
+
+Double-check that you are entering the Jellyfin username and password of an admin account, not the server's OS password.
+
+**Auto-detect finds no media paths**
+
+This happens if no libraries have been set up in Jellyfin yet, or the library paths are on a network share that the plugin cannot resolve. Go to **Admin → Plugins → Storage Manager → Settings** and add the path manually.
+
+---
+
 ## Publishing a release (for maintainers)
 
 This section explains how to cut a new version so the catalog manifest stays up to date.
@@ -160,21 +218,11 @@ This section explains how to cut a new version so the catalog manifest stays up 
 
 The repository includes a GitHub Actions release workflow at `.github/workflows/release.yml` that handles everything automatically when you push a version tag.
 
-**One-time setup:**
-
-Before your first release, edit `manifest.json` and replace `BeanGreen247` with your actual GitHub username. Commit that change to `main`.
-
 **Releasing a new version:**
 
 ```bash
-# 1. Bump the version, rebuild, and update manifest.json locally
-./build-release.sh 1.2.0
-
-# 2. Follow the printed instructions — they will look like this:
-git add manifest.json Jellyfin.Plugin.StorageManager.csproj
-git commit -m "chore: release v1.2.0"
 git tag v1.2.0
-git push origin main v1.2.0
+git push origin v1.2.0
 ```
 
 Pushing the tag triggers the release workflow, which:
@@ -190,11 +238,11 @@ Within a few minutes, the updated manifest URL will serve the new version and an
 `manifest.json` is a JSON file hosted at the raw GitHub URL. Jellyfin fetches it when it checks for updates. Each entry in the `versions` array tells Jellyfin:
 
 - Which version this is (`version`)
-- The minimum Jellyfin server version required (`targetAbi`)
+- The minimum Jellyfin server version required (`targetAbi` — currently `10.11.0.0`)
 - Where to download the DLL (`sourceUrl` — points to the GitHub Release asset)
 - The MD5 of that DLL (`checksum`) so Jellyfin can verify the download before installing
 
-The release workflow fills all of this in automatically. You never need to edit `manifest.json` by hand after the initial username setup.
+The release workflow fills all of this in automatically. You never need to edit `manifest.json` by hand.
 
 ---
 
@@ -217,7 +265,7 @@ If auto-detect is on and you also add manual paths, both sets are combined.
 
 The plugin reads the physical locations of all Jellyfin libraries (`Admin → Libraries`) and determines which filesystem root they live on. That root is treated as the manageable media drive.
 
-**Example:** if your Movies library points to `/mnt/media/Movies`, the plugin marks `/mnt/media/` (or the whole `/mnt/media` mount) as manageable.
+**Example:** if your Movies library points to `/mnt/media/Movies`, the plugin marks `/mnt/media/` as manageable.
 
 All other drives visible to the OS are shown in the overview but cannot be browsed or modified.
 
@@ -235,7 +283,7 @@ All other drives visible to the OS are shown in the overview but cannot be brows
 ## Building from source
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/BeanGreen247/jellyfin-storage-manager.git
 cd jellyfin-storage-manager
 dotnet publish --configuration Release --output ./artifacts
 # DLL is at: artifacts/Jellyfin.Plugin.StorageManager.dll
@@ -243,13 +291,15 @@ dotnet publish --configuration Release --output ./artifacts
 
 ### Targeting a different Jellyfin version
 
-Edit `Jellyfin.Plugin.StorageManager.csproj` and change the package version to match your server:
+Edit `Jellyfin.Plugin.StorageManager.csproj` and change both the package version and target framework to match your server:
 
-```xml
-<PackageReference Include="Jellyfin.Controller" Version="10.9.11" />
-```
+| Jellyfin version | `TargetFramework` | `Jellyfin.Controller` version |
+|---|---|---|
+| 10.11.x | `net9.0` | `10.11.10` |
+| 10.10.x | `net8.0` | `10.10.7` |
+| 10.9.x | `net8.0` | `10.9.11` |
 
-Run `dotnet restore` then rebuild.
+Run `dotnet restore` then rebuild after changing either value.
 
 ---
 
