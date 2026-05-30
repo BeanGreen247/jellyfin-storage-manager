@@ -10,14 +10,12 @@ jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # needed to push the manifest commit and create the release
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
         with:
-          # Use the default GITHUB_TOKEN — it can push back to the repo
           token: ${{ secrets.GITHUB_TOKEN }}
-          # Fetch full history so we can push back to main
           fetch-depth: 0
 
       - uses: actions/setup-dotnet@v4
@@ -50,40 +48,26 @@ jobs:
 
       # Prepend the new version entry to manifest.json so newest is always first
       - name: Update manifest.json
-        env:
-          VERSION: ${{ steps.ver.outputs.version }}
-          CHECKSUM: ${{ steps.checksum.outputs.md5 }}
-          TAG: ${{ github.ref_name }}
-          REPO: ${{ github.repository }}
         run: |
+          VERSION="${{ steps.ver.outputs.version }}"
+          CHECKSUM="${{ steps.checksum.outputs.md5 }}"
+          SOURCE_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/Jellyfin.Plugin.StorageManager.dll"
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%S.0000000Z")
-          SOURCE_URL="https://github.com/${REPO}/releases/download/${TAG}/Jellyfin.Plugin.StorageManager.dll"
 
-          python3 - <<PYEOF
-          import json, os
-
-          with open("manifest.json") as f:
-              data = json.load(f)
-
-          new_version = {
-              "version": os.environ["VERSION"] + ".0",
-              "changelog": "See the GitHub release notes for details.",
-              "targetAbi": "10.9.0.0",
-              "sourceUrl": os.environ["SOURCE_URL"],
-              "checksum": os.environ["CHECKSUM"],
-              "timestamp": os.environ["TIMESTAMP"],
-          }
-
-          # Newest version first
-          data[0]["versions"].insert(0, new_version)
-
-          with open("manifest.json", "w") as f:
-              json.dump(data, f, indent=2)
-              f.write("\n")
-          PYEOF
-        env:
-          SOURCE_URL: https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/Jellyfin.Plugin.StorageManager.dll
-          TIMESTAMP: ${{ steps.ver.outputs.version }}
+          jq \
+            --arg v  "${VERSION}.0" \
+            --arg url "$SOURCE_URL" \
+            --arg cs  "$CHECKSUM" \
+            --arg ts  "$TIMESTAMP" \
+            '.[0].versions = [{
+              version:   $v,
+              changelog: "See the GitHub release notes for details.",
+              targetAbi: "10.9.0.0",
+              sourceUrl: $url,
+              checksum:  $cs,
+              timestamp: $ts
+            }] + .[0].versions' \
+            manifest.json > manifest.tmp && mv manifest.tmp manifest.json
 
       # Commit the updated manifest back to main so the raw GitHub URL stays current
       - name: Commit manifest
