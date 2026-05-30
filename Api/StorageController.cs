@@ -263,6 +263,53 @@ public class StorageController : ControllerBase
     }
 
     // -------------------------------------------------------------------------
+    // POST /StorageManager/upload
+    // Uploads a file into the given directory on the media drive.
+    // -------------------------------------------------------------------------
+    [HttpPost("upload")]
+    [DisableRequestSizeLimit]
+    [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult> Upload([FromQuery] string path, IFormFile file)
+    {
+        if (!await IsAdminAsync().ConfigureAwait(false))
+            return Forbid();
+
+        if (!IsPathOnMediaDrive(path))
+            return StatusCode(StatusCodes.Status403Forbidden, "Path is not on a manageable media drive");
+
+        if (file is null || file.Length == 0)
+            return BadRequest("No file provided");
+
+        string dirPath;
+        try { dirPath = Path.GetFullPath(path); }
+        catch { return BadRequest("Invalid path"); }
+
+        if (!Directory.Exists(dirPath))
+            return BadRequest("Target directory does not exist");
+
+        // Strip any directory components from the client-supplied filename
+        var fileName = Path.GetFileName(file.FileName);
+        if (string.IsNullOrWhiteSpace(fileName) ||
+            fileName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+            return BadRequest("Invalid filename");
+
+        var targetPath = Path.GetFullPath(Path.Combine(dirPath, fileName));
+
+        // Final traversal guard — resolved target must still be inside dirPath
+        if (!targetPath.StartsWith(dirPath, StringComparison.OrdinalIgnoreCase))
+            return BadRequest("Invalid filename");
+
+        await using var stream = System.IO.File.Create(targetPath);
+        await file.CopyToAsync(stream).ConfigureAwait(false);
+
+        _logger.LogInformation("Storage Manager: uploaded {File} → {Path}", fileName, dirPath);
+        return NoContent();
+    }
+
+    // -------------------------------------------------------------------------
     // GET /StorageManager/config
     // Returns current plugin configuration plus auto-detected paths.
     // -------------------------------------------------------------------------

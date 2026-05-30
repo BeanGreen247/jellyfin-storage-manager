@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Storage Manager</title>
     <style>
         :root {
@@ -23,15 +22,13 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
+        #StorageManagerPage .sm-wrap {
             font-family: 'Noto Sans', 'Segoe UI', Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text);
             padding: 24px;
-            min-height: 100vh;
+            color: var(--text);
         }
 
-        h1 {
+        #StorageManagerPage h1 {
             font-size: 1.6rem;
             font-weight: 600;
             margin-bottom: 6px;
@@ -40,21 +37,21 @@
             gap: 10px;
         }
 
-        .subtitle {
+        #StorageManagerPage .subtitle {
             color: var(--muted);
             font-size: 0.875rem;
             margin-bottom: 28px;
         }
 
-        /* ── Drive cards ───────────────────────────────────────────────── */
-        .drives-grid {
+        /* ── Drive cards ───────────────────────────────────────── */
+        #StorageManagerPage .drives-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 16px;
             margin-bottom: 32px;
         }
 
-        .drive-card {
+        #StorageManagerPage .drive-card {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
@@ -63,373 +60,318 @@
             transition: border-color 0.2s;
         }
 
-        .drive-card.media {
-            border-color: var(--accent);
-        }
+        #StorageManagerPage .drive-card.media { border-color: var(--accent); }
 
-        .drive-card.media::before {
+        #StorageManagerPage .drive-card.media::before {
             content: 'MEDIA';
             position: absolute;
-            top: 10px;
-            right: 12px;
-            font-size: 0.65rem;
-            font-weight: 700;
-            letter-spacing: 0.08em;
+            top: 10px; right: 12px;
+            font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em;
             color: var(--accent);
             background: rgba(0,164,220,0.12);
-            padding: 2px 8px;
-            border-radius: 99px;
+            padding: 2px 8px; border-radius: 99px;
         }
 
-        .drive-name {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        #StorageManagerPage .drive-name {
+            font-size: 1rem; font-weight: 600; margin-bottom: 4px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
             padding-right: 60px;
         }
 
-        .drive-type {
-            font-size: 0.75rem;
-            color: var(--muted);
-            margin-bottom: 14px;
+        #StorageManagerPage .drive-type {
+            font-size: 0.75rem; color: var(--muted); margin-bottom: 14px;
         }
 
-        .usage-bar-wrap {
-            height: 8px;
-            background: var(--surface3);
-            border-radius: 99px;
-            overflow: hidden;
-            margin-bottom: 10px;
+        #StorageManagerPage .usage-bar-wrap {
+            height: 8px; background: var(--surface3);
+            border-radius: 99px; overflow: hidden; margin-bottom: 10px;
         }
 
-        .usage-bar {
-            height: 100%;
-            border-radius: 99px;
-            transition: width 0.4s ease;
+        #StorageManagerPage .usage-bar {
+            height: 100%; border-radius: 99px; transition: width 0.4s ease;
         }
 
-        .usage-bar.low    { background: var(--success); }
-        .usage-bar.medium { background: var(--warn); }
-        .usage-bar.high   { background: var(--danger); }
+        #StorageManagerPage .usage-bar.low    { background: var(--success); }
+        #StorageManagerPage .usage-bar.medium { background: var(--warn); }
+        #StorageManagerPage .usage-bar.high   { background: var(--danger); }
 
-        .drive-stats {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: var(--muted);
-            margin-bottom: 16px;
+        #StorageManagerPage .drive-stats {
+            display: flex; justify-content: space-between;
+            font-size: 0.8rem; color: var(--muted); margin-bottom: 16px;
         }
 
-        .drive-stats span strong {
-            color: var(--text);
-        }
+        #StorageManagerPage .drive-stats span strong { color: var(--text); }
 
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 7px 16px;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
+        /* ── Buttons ───────────────────────────────────────────── */
+        #StorageManagerPage .btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; border: none; border-radius: var(--radius);
+            font-size: 0.85rem; font-weight: 500; cursor: pointer;
             transition: opacity 0.15s, background 0.15s;
         }
 
-        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        #StorageManagerPage .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        #StorageManagerPage .btn-primary  { background: var(--accent); color: #fff; }
+        #StorageManagerPage .btn-primary:hover:not(:disabled) { background: var(--accent-dk); }
+        #StorageManagerPage .btn-ghost    { background: var(--surface3); color: var(--text); }
+        #StorageManagerPage .btn-ghost:hover:not(:disabled) { background: var(--border); }
+        #StorageManagerPage .btn-success  { background: var(--success); color: #fff; }
+        #StorageManagerPage .btn-success:hover:not(:disabled) { background: #388e3c; }
+        #StorageManagerPage .btn-danger   { background: var(--danger); color: #fff; }
+        #StorageManagerPage .btn-danger:hover:not(:disabled) { background: #c62828; }
+        #StorageManagerPage .btn-sm { padding: 4px 10px; font-size: 0.78rem; }
 
-        .btn-primary  { background: var(--accent);   color: #fff; }
-        .btn-primary:hover:not(:disabled) { background: var(--accent-dk); }
+        /* ── File browser ──────────────────────────────────────── */
+        #StorageManagerPage #browser-section { display: none; }
 
-        .btn-ghost    { background: var(--surface3); color: var(--text); }
-        .btn-ghost:hover:not(:disabled) { background: var(--border); }
-
-        .btn-danger   { background: var(--danger);   color: #fff; }
-        .btn-danger:hover:not(:disabled) { background: #c62828; }
-
-        .btn-sm {
-            padding: 4px 10px;
-            font-size: 0.78rem;
+        #StorageManagerPage .browser-header {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 16px; flex-wrap: wrap;
         }
 
-        /* ── File browser ──────────────────────────────────────────────── */
-        #browser-section { display: none; }
-
-        .browser-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
+        #StorageManagerPage .breadcrumb {
+            flex: 1; background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 8px 14px;
+            font-size: 0.85rem; color: var(--muted);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
-        .breadcrumb {
-            flex: 1;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 8px 14px;
-            font-size: 0.85rem;
-            color: var(--muted);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        #StorageManagerPage .breadcrumb .crumb { color: var(--accent); cursor: pointer; }
+        #StorageManagerPage .breadcrumb .crumb:hover { text-decoration: underline; }
+        #StorageManagerPage .breadcrumb .sep { margin: 0 4px; }
+
+        /* ── Drop zone ─────────────────────────────────────────── */
+        #StorageManagerPage .drop-zone-wrap {
+            border: 2px dashed var(--border); border-radius: var(--radius);
+            transition: border-color 0.2s, background 0.2s;
         }
 
-        .breadcrumb .crumb {
-            color: var(--accent);
-            cursor: pointer;
+        #StorageManagerPage .drop-zone-wrap.drag-over {
+            border-color: var(--accent);
+            background: rgba(0,164,220,0.06);
         }
 
-        .breadcrumb .crumb:hover { text-decoration: underline; }
-        .breadcrumb .sep { margin: 0 4px; }
-
-        .file-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            overflow: hidden;
+        /* ── File table ────────────────────────────────────────── */
+        #StorageManagerPage .file-table {
+            width: 100%; border-collapse: collapse;
+            background: var(--surface); border-radius: var(--radius); overflow: hidden;
         }
 
-        .file-table th {
-            text-align: left;
-            padding: 12px 16px;
-            font-size: 0.78rem;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            color: var(--muted);
-            background: var(--surface2);
+        #StorageManagerPage .file-table th {
+            text-align: left; padding: 12px 16px;
+            font-size: 0.78rem; font-weight: 600;
+            letter-spacing: 0.05em; text-transform: uppercase;
+            color: var(--muted); background: var(--surface2);
             border-bottom: 1px solid var(--border);
         }
 
-        .file-table td {
-            padding: 10px 16px;
-            font-size: 0.875rem;
-            border-bottom: 1px solid var(--border);
-            vertical-align: middle;
+        #StorageManagerPage .file-table td {
+            padding: 10px 16px; font-size: 0.875rem;
+            border-bottom: 1px solid var(--border); vertical-align: middle;
         }
 
-        .file-table tr:last-child td { border-bottom: none; }
+        #StorageManagerPage .file-table tr:last-child td { border-bottom: none; }
+        #StorageManagerPage .file-table tr:hover td { background: var(--surface2); }
 
-        .file-table tr:hover td { background: var(--surface2); }
+        #StorageManagerPage .file-icon { font-size: 1.1rem; margin-right: 8px; vertical-align: middle; }
+        #StorageManagerPage .file-name-cell { display: flex; align-items: center; }
 
-        .file-icon {
-            font-size: 1.1rem;
-            margin-right: 8px;
-            vertical-align: middle;
+        #StorageManagerPage .file-name-btn {
+            background: none; border: none; color: var(--accent);
+            cursor: pointer; font-size: 0.875rem; text-align: left; padding: 0;
         }
 
-        .file-name-cell {
-            display: flex;
-            align-items: center;
+        #StorageManagerPage .file-name-btn:hover { text-decoration: underline; }
+        #StorageManagerPage .file-name-static { color: var(--text); }
+
+        #StorageManagerPage .actions-cell { display: flex; gap: 6px; justify-content: flex-end; }
+
+        #StorageManagerPage .empty-state {
+            text-align: center; padding: 48px 16px; color: var(--muted);
         }
 
-        .file-name-btn {
-            background: none;
-            border: none;
-            color: var(--accent);
-            cursor: pointer;
-            font-size: 0.875rem;
-            text-align: left;
-            padding: 0;
+        /* ── Upload progress ───────────────────────────────────── */
+        #StorageManagerPage .upload-list {
+            margin-top: 12px; display: flex; flex-direction: column; gap: 8px;
         }
 
-        .file-name-btn:hover { text-decoration: underline; }
-
-        .file-name-static { color: var(--text); }
-
-        .actions-cell {
-            display: flex;
-            gap: 6px;
-            justify-content: flex-end;
+        #StorageManagerPage .upload-item {
+            background: var(--surface2); border-radius: var(--radius);
+            padding: 10px 14px;
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 48px 16px;
-            color: var(--muted);
+        #StorageManagerPage .upload-item-name {
+            font-size: 0.85rem; margin-bottom: 6px;
+            display: flex; justify-content: space-between;
         }
 
-        .empty-state svg {
-            opacity: 0.3;
-            margin-bottom: 12px;
+        #StorageManagerPage .upload-bar-wrap {
+            height: 4px; background: var(--surface3); border-radius: 99px; overflow: hidden;
         }
 
-        /* ── Loading spinner ───────────────────────────────────────────── */
-        .spinner {
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
+        #StorageManagerPage .upload-bar {
+            height: 100%; border-radius: 99px; background: var(--accent);
+            transition: width 0.2s;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        #StorageManagerPage .upload-bar.done    { background: var(--success); }
+        #StorageManagerPage .upload-bar.errored { background: var(--danger); }
 
-        /* ── Modals ────────────────────────────────────────────────────── */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.7);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
+        /* ── Spinner ───────────────────────────────────────────── */
+        #StorageManagerPage .spinner {
+            display: inline-block; width: 18px; height: 18px;
+            border: 2px solid var(--border); border-top-color: var(--accent);
+            border-radius: 50%; animation: sm-spin 0.7s linear infinite;
         }
 
-        .modal-overlay.open { display: flex; }
+        @keyframes sm-spin { to { transform: rotate(360deg); } }
 
-        .modal {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 28px 32px;
-            width: 100%;
-            max-width: 440px;
+        /* ── Modals ────────────────────────────────────────────── */
+        .sm-modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7); z-index: 9999;
+            align-items: center; justify-content: center;
+        }
+
+        .sm-modal-overlay.open { display: flex; }
+
+        .sm-modal {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 28px 32px;
+            width: 100%; max-width: 480px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-        }
-
-        .modal h3 {
-            font-size: 1.1rem;
-            margin-bottom: 8px;
-        }
-
-        .modal p {
-            color: var(--muted);
-            font-size: 0.875rem;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-
-        .modal-path {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 6px 10px;
-            font-size: 0.8rem;
-            font-family: monospace;
-            color: var(--warn);
-            margin-bottom: 16px;
-            word-break: break-all;
-        }
-
-        .form-group { margin-bottom: 14px; }
-
-        .form-group label {
-            display: block;
-            font-size: 0.8rem;
-            color: var(--muted);
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 9px 12px;
+            font-family: 'Noto Sans', 'Segoe UI', Arial, sans-serif;
             color: var(--text);
-            font-size: 0.9rem;
-            outline: none;
-            transition: border-color 0.15s;
         }
 
-        .form-group input:focus { border-color: var(--accent); }
+        .sm-modal h3 { font-size: 1.1rem; margin-bottom: 8px; }
 
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
+        .sm-modal p { color: var(--muted); font-size: 0.875rem; margin-bottom: 16px; line-height: 1.5; }
+
+        .sm-modal .modal-path {
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 4px; padding: 6px 10px; font-size: 0.8rem;
+            font-family: monospace; color: var(--warn);
+            margin-bottom: 16px; word-break: break-all;
         }
 
-        /* ── Alert banner ──────────────────────────────────────────────── */
-        .alert {
-            padding: 12px 16px;
-            border-radius: var(--radius);
-            font-size: 0.875rem;
-            margin-bottom: 16px;
-            display: none;
+        .sm-modal .form-group { margin-bottom: 14px; }
+
+        .sm-modal .form-group label {
+            display: block; font-size: 0.8rem; color: var(--muted);
+            margin-bottom: 5px; font-weight: 500;
         }
 
-        .alert.show { display: block; }
+        .sm-modal .form-group input {
+            width: 100%; background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 4px; padding: 9px 12px; color: var(--text);
+            font-size: 0.9rem; outline: none; transition: border-color 0.15s;
+        }
+
+        .sm-modal .form-group input:focus { border-color: var(--accent); }
+
+        .sm-modal .modal-actions {
+            display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;
+        }
+
+        .sm-modal .btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; border: none; border-radius: var(--radius);
+            font-size: 0.85rem; font-weight: 500; cursor: pointer;
+        }
+
+        .sm-modal .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .sm-modal .btn-ghost  { background: var(--surface3); color: var(--text); }
+        .sm-modal .btn-primary { background: var(--accent); color: #fff; }
+        .sm-modal .btn-danger  { background: var(--danger); color: #fff; }
+
+        /* ── Alerts ────────────────────────────────────────────── */
+        #StorageManagerPage .alert, .sm-modal .alert {
+            padding: 12px 16px; border-radius: var(--radius);
+            font-size: 0.875rem; margin-bottom: 12px; display: none;
+        }
+
+        #StorageManagerPage .alert.show, .sm-modal .alert.show { display: block; }
         .alert.success { background: rgba(76,175,80,0.15); border: 1px solid var(--success); color: #81c784; }
         .alert.error   { background: rgba(244,67,54,0.15);  border: 1px solid var(--danger);  color: #ef9a9a; }
 
-        .section-title {
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.07em;
-            color: var(--muted);
-            margin-bottom: 14px;
+        #StorageManagerPage .section-title {
+            font-size: 0.85rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.07em; color: var(--muted); margin-bottom: 14px;
         }
     </style>
 </head>
 <body>
 
-<h1>
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--accent)">
-        <path d="M2 20h20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z"/>
-    </svg>
-    Storage Manager
-</h1>
-<p class="subtitle">Monitor disk usage and manage media drive contents. Only media drives are manageable.</p>
+<!-- Jellyfin requires this data-role="page" wrapper to register the page in its router -->
+<div id="StorageManagerPage" data-role="page" class="page libraryPage noSecondaryNavPage">
+    <div data-role="content">
+        <div class="content-primary sm-wrap">
 
-<div id="global-alert" class="alert"></div>
+            <h1>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--accent)">
+                    <path d="M2 20h20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z"/>
+                </svg>
+                Storage Manager
+            </h1>
+            <p class="subtitle">Monitor disk usage and manage media drive contents. Only media drives are manageable.</p>
 
-<!-- ── Drive overview ────────────────────────────────────────────────── -->
-<section id="drives-section">
-    <div class="section-title">All Drives</div>
-    <div class="drives-grid" id="drives-grid">
-        <div style="color:var(--muted);display:flex;align-items:center;gap:10px;">
-            <div class="spinner"></div> Loading drives…
-        </div>
-    </div>
-</section>
+            <div id="global-alert" class="alert"></div>
 
-<!-- ── File browser ──────────────────────────────────────────────────── -->
-<section id="browser-section">
-    <div class="browser-header">
-        <button class="btn btn-ghost" onclick="showDrives()">
-            ← Back to Drives
-        </button>
-        <div class="breadcrumb" id="breadcrumb"></div>
-        <button class="btn btn-ghost btn-sm" onclick="refreshBrowser()" title="Refresh">
-            ↺ Refresh
-        </button>
-    </div>
+            <!-- ── Drive overview ───────────────────────────────────── -->
+            <section id="drives-section">
+                <div class="section-title">All Drives</div>
+                <div class="drives-grid" id="drives-grid">
+                    <div style="color:var(--muted);display:flex;align-items:center;gap:10px;">
+                        <div class="spinner"></div> Loading drives…
+                    </div>
+                </div>
+            </section>
 
-    <div id="browser-alert" class="alert"></div>
+            <!-- ── File browser ─────────────────────────────────────── -->
+            <section id="browser-section">
+                <div class="browser-header">
+                    <button class="btn btn-ghost" onclick="showDrives()">← Back</button>
+                    <div class="breadcrumb" id="breadcrumb"></div>
+                    <button class="btn btn-success btn-sm" onclick="triggerUpload()" title="Upload files to current folder">
+                        ↑ Upload
+                    </button>
+                    <button class="btn btn-ghost btn-sm" onclick="refreshBrowser()">↺ Refresh</button>
+                </div>
 
-    <div id="file-list-wrap">
-        <table class="file-table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Size</th>
-                    <th>Modified</th>
-                    <th style="text-align:right">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="file-list"></tbody>
-        </table>
-    </div>
-</section>
+                <input type="file" id="upload-input" multiple style="display:none"
+                       onchange="handleFileInput(this.files)" />
 
-<!-- ── Rename Modal ──────────────────────────────────────────────────── -->
-<div class="modal-overlay" id="rename-modal">
-    <div class="modal">
+                <div id="browser-alert" class="alert"></div>
+
+                <!-- upload progress list -->
+                <div id="upload-list" class="upload-list" style="display:none"></div>
+
+                <div class="drop-zone-wrap" id="drop-zone">
+                    <table class="file-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Size</th>
+                                <th>Modified</th>
+                                <th style="text-align:right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="file-list"></tbody>
+                    </table>
+                </div>
+                <p style="font-size:0.75rem;color:var(--muted);margin-top:8px;text-align:center">
+                    You can also drag &amp; drop files onto the table to upload them here.
+                </p>
+            </section>
+
+        </div><!-- content-primary -->
+    </div><!-- content -->
+</div><!-- StorageManagerPage -->
+
+<!-- ── Rename Modal ──────────────────────────────────────────────── -->
+<div class="sm-modal-overlay" id="rename-modal">
+    <div class="sm-modal">
         <h3>Rename</h3>
         <p>Enter a new name for the selected item.</p>
         <div class="modal-path" id="rename-old-path"></div>
@@ -446,9 +388,9 @@
     </div>
 </div>
 
-<!-- ── Delete Modal ──────────────────────────────────────────────────── -->
-<div class="modal-overlay" id="delete-modal">
-    <div class="modal">
+<!-- ── Delete Modal ──────────────────────────────────────────────── -->
+<div class="sm-modal-overlay" id="delete-modal">
+    <div class="sm-modal">
         <h3>Confirm Deletion</h3>
         <p id="delete-desc">This action is <strong>permanent</strong> and cannot be undone.</p>
         <div class="modal-path" id="delete-path-label"></div>
@@ -472,21 +414,27 @@
 </div>
 
 <script>
-// ============================================================
+'use strict';
+
+// ================================================================
 // API helpers
-// ============================================================
+// ================================================================
 function serverBase() {
-    if (typeof ApiClient !== 'undefined' && ApiClient.serverAddress)
-        return ApiClient.serverAddress().replace(/\/$/, '');
+    if (typeof ApiClient !== 'undefined') {
+        const addr = ApiClient.serverAddress ? ApiClient.serverAddress() : window.location.origin;
+        return addr.replace(/\/$/, '');
+    }
     return window.location.origin;
 }
 
-function authHeaders() {
-    const h = { 'Content-Type': 'application/json' };
-    if (typeof ApiClient !== 'undefined' && ApiClient.accessToken) {
-        h['Authorization'] = `MediaBrowser Token="${ApiClient.accessToken()}"`;
-    }
-    return h;
+function token() {
+    if (typeof ApiClient !== 'undefined' && ApiClient.accessToken)
+        return ApiClient.accessToken();
+    return '';
+}
+
+function authHeaders(extra) {
+    return Object.assign({ 'Authorization': `MediaBrowser Token="${token()}"` }, extra || {});
 }
 
 async function apiGet(path) {
@@ -498,80 +446,81 @@ async function apiGet(path) {
 async function apiPost(path, body) {
     const r = await fetch(serverBase() + path, {
         method: 'POST',
-        headers: authHeaders(),
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(body),
     });
     if (!r.ok) throw new Error(await r.text() || r.statusText);
     return r.status === 204 ? null : r.json();
 }
 
-// ============================================================
+// ================================================================
 // Formatting
-// ============================================================
+// ================================================================
 function fmtBytes(b) {
     if (!b || b === 0) return '0 B';
-    const k = 1024, units = ['B','KB','MB','GB','TB'];
+    const k = 1024, u = ['B','KB','MB','GB','TB'];
     const i = Math.floor(Math.log(b) / Math.log(k));
-    return (b / Math.pow(k, i)).toFixed(i ? 2 : 0) + ' ' + units[i];
+    return (b / Math.pow(k, i)).toFixed(i ? 2 : 0) + ' ' + u[i];
 }
 
 function fmtDate(s) {
     if (!s) return '—';
     const d = new Date(s);
-    return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
 }
 
 function barClass(pct) {
-    if (pct < 70) return 'low';
-    if (pct < 90) return 'medium';
-    return 'high';
+    return pct < 70 ? 'low' : pct < 90 ? 'medium' : 'high';
 }
 
-// ============================================================
+function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function escAttr(s) {
+    return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+}
+
+// ================================================================
 // Drive overview
-// ============================================================
+// ================================================================
 let drives = [];
 
 async function loadDrives() {
+    const grid = document.getElementById('drives-grid');
+    grid.innerHTML = '<div style="color:var(--muted);display:flex;align-items:center;gap:10px;"><div class="spinner"></div> Loading drives…</div>';
     try {
         drives = await apiGet('/StorageManager/drives');
         renderDrives();
     } catch (e) {
-        document.getElementById('drives-grid').innerHTML =
-            `<div style="color:var(--danger)">Failed to load drives: ${e.message}</div>`;
+        grid.innerHTML = `<div style="color:var(--danger)">Failed to load drives: ${escHtml(e.message)}</div>`;
     }
 }
 
 function renderDrives() {
     const grid = document.getElementById('drives-grid');
-    if (!drives.length) {
-        grid.innerHTML = '<div style="color:var(--muted)">No drives found.</div>';
-        return;
-    }
+    if (!drives.length) { grid.innerHTML = '<div style="color:var(--muted)">No drives found.</div>'; return; }
 
     grid.innerHTML = drives.map(d => `
         <div class="drive-card ${d.isMediaDrive ? 'media' : ''}">
-            <div class="drive-name" title="${d.rootPath}">${escHtml(d.name)}</div>
-            <div class="drive-type">${d.driveType}${d.driveFormat ? ' · ' + escHtml(d.driveFormat) : ''}</div>
+            <div class="drive-name" title="${escHtml(d.rootPath)}">${escHtml(d.name)}</div>
+            <div class="drive-type">${escHtml(d.driveType)}${d.driveFormat ? ' · ' + escHtml(d.driveFormat) : ''}</div>
             <div class="usage-bar-wrap">
-                <div class="usage-bar ${barClass(d.usedPercentage)}"
-                     style="width:${Math.min(d.usedPercentage, 100)}%"></div>
+                <div class="usage-bar ${barClass(d.usedPercentage)}" style="width:${Math.min(d.usedPercentage,100)}%"></div>
             </div>
             <div class="drive-stats">
                 <span><strong>${fmtBytes(d.usedSpace)}</strong> used</span>
                 <span><strong>${d.usedPercentage}%</strong></span>
                 <span><strong>${fmtBytes(d.freeSpace)}</strong> free</span>
             </div>
-            <div style="font-size:0.78rem;color:var(--muted);margin-bottom:${d.isManageable ? '14px' : '0'}">
+            <div style="font-size:0.78rem;color:var(--muted);margin-bottom:${d.isManageable?'14px':'0'}">
                 Total: <strong style="color:var(--text)">${fmtBytes(d.totalSize)}</strong>
             </div>
             ${d.isManageable
-                ? `<button class="btn btn-primary btn-sm" onclick="openBrowser('${escAttr(d.rootPath)}')">
-                       Browse &amp; Manage →
-                   </button>`
-                : ''}
-        </div>
-    `).join('');
+                ? `<button class="btn btn-primary btn-sm" onclick="openBrowser('${escAttr(d.rootPath)}')">Browse &amp; Manage →</button>`
+                : '<span style="font-size:0.75rem;color:var(--muted)">Read-only</span>'}
+        </div>`).join('');
 }
 
 function showDrives() {
@@ -580,9 +529,9 @@ function showDrives() {
     loadDrives();
 }
 
-// ============================================================
+// ================================================================
 // File browser
-// ============================================================
+// ================================================================
 let currentPath = '';
 let requirePassword = true;
 
@@ -592,8 +541,8 @@ async function openBrowser(path) {
     try {
         const cfg = await apiGet('/StorageManager/config');
         requirePassword = cfg.requirePasswordForDelete !== false;
-    } catch { /* use default */ }
-    await browseTo(path);
+    } catch { /* keep default */ }
+    browseTo(path);
 }
 
 async function browseTo(path) {
@@ -604,7 +553,7 @@ async function browseTo(path) {
     try {
         const data = await apiGet('/StorageManager/browse?path=' + encodeURIComponent(path));
         currentPath = data.currentPath;
-        renderBreadcrumb(data.currentPath, data.parentPath);
+        renderBreadcrumb(data.currentPath);
         renderFileList(data.entries, data.parentPath);
     } catch (e) {
         showAlert('browser-alert', 'error', 'Failed to load directory: ' + e.message);
@@ -614,98 +563,150 @@ async function browseTo(path) {
 
 function refreshBrowser() { browseTo(currentPath); }
 
-function renderBreadcrumb(path, parentPath) {
+function renderBreadcrumb(path) {
     const bc = document.getElementById('breadcrumb');
-    const parts = path.replace(/\\/g, '/').split('/').filter(Boolean);
-    let built = '';
+    const sep = path.includes('/') ? '/' : '\\';
+    const parts = path.replace(/\\/g,'/').split('/').filter(Boolean);
+    let built = path.startsWith('/') ? '/' : '';
     const crumbs = parts.map((p, i) => {
-        built += (i === 0 ? (path.startsWith('/') ? '/' : '') : '/') + p;
+        built += (i === 0 ? '' : '/') + p;
         const snap = built;
         return `<span class="crumb" onclick="browseTo('${escAttr(snap)}')">${escHtml(p)}</span>`;
     });
-    bc.innerHTML = (path.startsWith('/') ? '' : '') + crumbs.join('<span class="sep">/</span>');
+    bc.innerHTML = crumbs.join('<span class="sep">/</span>');
+}
+
+function fileIcon(name) {
+    const ext = (name.split('.').pop() || '').toLowerCase();
+    const m = { mp4:'🎬',mkv:'🎬',avi:'🎬',mov:'🎬',wmv:'🎬',m4v:'🎬',ts:'🎬',
+                mp3:'🎵',flac:'🎵',aac:'🎵',ogg:'🎵',wav:'🎵',
+                jpg:'🖼',jpeg:'🖼',png:'🖼',gif:'🖼',webp:'🖼',bmp:'🖼',
+                srt:'📝',ass:'📝',vtt:'📝',nfo:'📄',txt:'📄',
+                zip:'🗜',rar:'🗜','7z':'🗜',tar:'🗜',gz:'🗜' };
+    return m[ext] || '📄';
 }
 
 function renderFileList(entries, parentPath) {
     const tbody = document.getElementById('file-list');
-
-    if (!entries.length && !parentPath) {
-        tbody.innerHTML = `
-            <tr><td colspan="4">
-                <div class="empty-state">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
-                    </svg>
-                    <div>This folder is empty</div>
-                </div>
-            </td></tr>`;
-        return;
-    }
-
     let rows = '';
 
     if (parentPath) {
-        rows += `
-            <tr>
-                <td>
-                    <button class="file-name-btn" onclick="browseTo('${escAttr(parentPath)}')">
-                        <span class="file-icon">📁</span>..  (parent folder)
-                    </button>
-                </td>
-                <td>—</td><td>—</td><td></td>
-            </tr>`;
+        rows += `<tr>
+            <td><button class="file-name-btn" onclick="browseTo('${escAttr(parentPath)}')">
+                <span class="file-icon">📁</span>.. (parent folder)
+            </button></td>
+            <td>—</td><td>—</td><td></td>
+        </tr>`;
+    }
+
+    if (!entries.length && !parentPath) {
+        tbody.innerHTML = `<tr><td colspan="4">
+            <div class="empty-state">
+                <div style="font-size:3rem;opacity:0.3;margin-bottom:12px">📁</div>
+                <div>This folder is empty — drag files here or click Upload</div>
+            </div>
+        </td></tr>`;
+        return;
     }
 
     rows += entries.map(e => {
         const icon = e.isDirectory ? '📁' : fileIcon(e.name);
         const size = e.isDirectory
-            ? (e.childCount ? `${e.childCount} item${e.childCount !== 1 ? 's' : ''}` : '—')
+            ? (e.childCount ? `${e.childCount} item${e.childCount!==1?'s':''}` : '—')
             : fmtBytes(e.size);
-
         const nameCell = e.isDirectory
-            ? `<button class="file-name-btn" onclick="browseTo('${escAttr(e.path)}')">
-                   <span class="file-icon">${icon}</span>${escHtml(e.name)}
-               </button>`
+            ? `<button class="file-name-btn" onclick="browseTo('${escAttr(e.path)}')"><span class="file-icon">${icon}</span>${escHtml(e.name)}</button>`
             : `<span class="file-name-static"><span class="file-icon">${icon}</span>${escHtml(e.name)}</span>`;
-
-        return `
-            <tr>
-                <td><div class="file-name-cell">${nameCell}</div></td>
-                <td style="color:var(--muted);white-space:nowrap">${size}</td>
-                <td style="color:var(--muted);white-space:nowrap;font-size:0.8rem">${fmtDate(e.lastModified)}</td>
-                <td>
-                    <div class="actions-cell">
-                        <button class="btn btn-ghost btn-sm"
-                                onclick="openRenameModal('${escAttr(e.path)}', '${escAttr(e.name)}')">
-                            ✏ Rename
-                        </button>
-                        <button class="btn btn-danger btn-sm"
-                                onclick="openDeleteModal('${escAttr(e.path)}', '${escAttr(e.name)}', ${e.isDirectory})">
-                            🗑 Delete
-                        </button>
-                    </div>
-                </td>
-            </tr>`;
+        return `<tr>
+            <td><div class="file-name-cell">${nameCell}</div></td>
+            <td style="color:var(--muted);white-space:nowrap">${size}</td>
+            <td style="color:var(--muted);white-space:nowrap;font-size:0.8rem">${fmtDate(e.lastModified)}</td>
+            <td><div class="actions-cell">
+                <button class="btn btn-ghost btn-sm" onclick="openRenameModal('${escAttr(e.path)}','${escAttr(e.name)}')">✏ Rename</button>
+                <button class="btn btn-danger btn-sm" onclick="openDeleteModal('${escAttr(e.path)}','${escAttr(e.name)}',${e.isDirectory})">🗑 Delete</button>
+            </div></td>
+        </tr>`;
     }).join('');
 
     tbody.innerHTML = rows;
 }
 
-function fileIcon(name) {
-    const ext = name.split('.').pop().toLowerCase();
-    const map = {
-        mp4:'🎬', mkv:'🎬', avi:'🎬', mov:'🎬', wmv:'🎬', m4v:'🎬', ts:'🎬',
-        mp3:'🎵', flac:'🎵', aac:'🎵', ogg:'🎵', wav:'🎵',
-        jpg:'🖼', jpeg:'🖼', png:'🖼', gif:'🖼', webp:'🖼', bmp:'🖼',
-        srt:'📝', ass:'📝', vtt:'📝', nfo:'📄', txt:'📄',
-        zip:'🗜', rar:'🗜', '7z':'🗜', tar:'🗜', gz:'🗜',
-    };
-    return map[ext] || '📄';
+// ================================================================
+// File upload
+// ================================================================
+function triggerUpload() {
+    document.getElementById('upload-input').click();
 }
 
-// ============================================================
+function handleFileInput(files) {
+    if (files && files.length) uploadFiles(Array.from(files));
+    document.getElementById('upload-input').value = '';
+}
+
+async function uploadFiles(files) {
+    const listEl = document.getElementById('upload-list');
+    listEl.style.display = 'flex';
+    listEl.innerHTML = '';
+
+    for (const file of files) {
+        const id = 'up-' + Math.random().toString(36).slice(2);
+        listEl.insertAdjacentHTML('beforeend', `
+            <div class="upload-item" id="${id}">
+                <div class="upload-item-name">
+                    <span>${escHtml(file.name)}</span>
+                    <span id="${id}-status">Uploading…</span>
+                </div>
+                <div class="upload-bar-wrap">
+                    <div class="upload-bar" id="${id}-bar" style="width:5%"></div>
+                </div>
+            </div>`);
+
+        try {
+            const bar = document.getElementById(`${id}-bar`);
+            bar.style.width = '30%';
+
+            const form = new FormData();
+            form.append('file', file);
+
+            const r = await fetch(
+                `${serverBase()}/StorageManager/upload?path=${encodeURIComponent(currentPath)}`,
+                { method: 'POST', headers: authHeaders(), body: form }
+            );
+
+            if (!r.ok) throw new Error(await r.text() || r.statusText);
+
+            bar.style.width = '100%';
+            bar.classList.add('done');
+            document.getElementById(`${id}-status`).textContent = '✓ Done';
+        } catch (e) {
+            const bar = document.getElementById(`${id}-bar`);
+            bar.style.width = '100%';
+            bar.classList.add('errored');
+            document.getElementById(`${id}-status`).textContent = '✗ ' + e.message;
+        }
+    }
+
+    setTimeout(() => {
+        listEl.style.display = 'none';
+        listEl.innerHTML = '';
+        refreshBrowser();
+    }, 2000);
+}
+
+// Drag-and-drop
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length && currentPath) uploadFiles(files);
+});
+
+// ================================================================
 // Rename modal
-// ============================================================
+// ================================================================
 let renamePath = '';
 
 function openRenameModal(path, name) {
@@ -715,104 +716,78 @@ function openRenameModal(path, name) {
     input.value = name;
     clearAlert('rename-alert');
     openModal('rename-modal');
-    setTimeout(() => { input.select(); }, 80);
+    setTimeout(() => input.select(), 80);
 }
 
 async function confirmRename() {
     const newName = document.getElementById('rename-input').value.trim();
-    if (!newName) {
-        showAlert('rename-alert', 'error', 'Name cannot be empty.');
-        return;
-    }
-
+    if (!newName) { showAlert('rename-alert', 'error', 'Name cannot be empty.'); return; }
     try {
         await apiPost('/StorageManager/rename', { oldPath: renamePath, newName });
         closeModal('rename-modal');
-        showAlert('browser-alert', 'success', `Renamed successfully to "${escHtml(newName)}".`);
+        showAlert('browser-alert', 'success', `Renamed to "${escHtml(newName)}".`);
         refreshBrowser();
     } catch (e) {
         showAlert('rename-alert', 'error', e.message);
     }
 }
 
-// ============================================================
+// ================================================================
 // Delete modal
-// ============================================================
+// ================================================================
 let deletePath = '';
 
 function openDeleteModal(path, name, isDir) {
     deletePath = path;
     document.getElementById('delete-path-label').textContent = path;
     document.getElementById('delete-desc').innerHTML = isDir
-        ? `You are about to permanently delete the folder <strong>${escHtml(name)}</strong> and <em>all its contents</em>. This cannot be undone.`
-        : `You are about to permanently delete <strong>${escHtml(name)}</strong>. This cannot be undone.`;
-
-    const authFields = document.getElementById('delete-auth-fields');
-    authFields.style.display = requirePassword ? '' : 'none';
-
+        ? `Permanently delete folder <strong>${escHtml(name)}</strong> and <em>all its contents</em>. This cannot be undone.`
+        : `Permanently delete <strong>${escHtml(name)}</strong>. This cannot be undone.`;
+    document.getElementById('delete-auth-fields').style.display = requirePassword ? '' : 'none';
     document.getElementById('delete-username').value = '';
     document.getElementById('delete-password').value = '';
     clearAlert('delete-alert');
     openModal('delete-modal');
-    if (requirePassword) {
-        setTimeout(() => document.getElementById('delete-username').focus(), 80);
-    }
+    if (requirePassword) setTimeout(() => document.getElementById('delete-username').focus(), 80);
 }
 
 async function confirmDelete() {
     const username = document.getElementById('delete-username').value.trim();
     const password = document.getElementById('delete-password').value;
-
     if (requirePassword && (!username || !password)) {
         showAlert('delete-alert', 'error', 'Please enter your username and password.');
         return;
     }
-
     const btn = document.getElementById('delete-confirm-btn');
-    btn.disabled = true;
-    btn.textContent = 'Deleting…';
-
+    btn.disabled = true; btn.textContent = 'Deleting…';
     try {
-        await apiPost('/StorageManager/delete', {
-            path: deletePath,
-            username: username || '',
-            password: password || '',
-        });
+        await apiPost('/StorageManager/delete', { path: deletePath, username: username||'', password: password||'' });
         closeModal('delete-modal');
-        showAlert('browser-alert', 'success', 'Item deleted successfully.');
+        showAlert('browser-alert', 'success', 'Deleted successfully.');
         refreshBrowser();
     } catch (e) {
         const msg = e.message.includes('401') || e.message.toLowerCase().includes('invalid')
-            ? 'Invalid credentials. Please check your username and password.'
-            : e.message;
+            ? 'Invalid credentials.' : e.message;
         showAlert('delete-alert', 'error', msg);
     } finally {
-        btn.disabled = false;
-        btn.textContent = 'Delete';
+        btn.disabled = false; btn.textContent = 'Delete';
     }
 }
 
-// ============================================================
-// Modal helpers
-// ============================================================
+// ================================================================
+// Modal / alert helpers
+// ================================================================
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', e => {
-        if (e.target === overlay) overlay.classList.remove('open');
-    });
-});
+document.querySelectorAll('.sm-modal-overlay').forEach(o =>
+    o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }));
 
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape')
-        document.querySelectorAll('.modal-overlay.open')
-                .forEach(m => m.classList.remove('open'));
+        document.querySelectorAll('.sm-modal-overlay.open').forEach(m => m.classList.remove('open'));
 });
 
-// ============================================================
-// Alert helpers
-// ============================================================
 function showAlert(id, type, msg) {
     const el = document.getElementById(id);
     el.className = `alert ${type} show`;
@@ -825,23 +800,15 @@ function clearAlert(id) {
     el.textContent = '';
 }
 
-// ============================================================
-// Security helpers
-// ============================================================
-function escHtml(s) {
-    return String(s)
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+// ================================================================
+// Boot — use Jellyfin's viewshow event so ApiClient is ready
+// ================================================================
+document.getElementById('StorageManagerPage').addEventListener('viewshow', loadDrives);
 
-function escAttr(s) {
-    return String(s).replace(/'/g, "\\'").replace(/\\/g, '\\\\');
+// Fallback for direct browser access during development
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    if (typeof ApiClient !== 'undefined') loadDrives();
 }
-
-// ============================================================
-// Boot
-// ============================================================
-loadDrives();
 </script>
 </body>
 </html>
