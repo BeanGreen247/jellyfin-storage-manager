@@ -1,4 +1,5 @@
-using Jellyfin.Data.Enums;
+using Jellyfin.Data;
+using Jellyfin.Database.Implementations.Enums;
 using Jellyfin.Plugin.StorageManager.Models;
 using MediaBrowser.Controller.Authentication;
 using MediaBrowser.Controller.Library;

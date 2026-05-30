@@ -78,7 +78,7 @@ with open("$MANIFEST") as f:
 new_version = {
     "version": "${VERSION}.0",
     "changelog": "See the GitHub release notes for details.",
-    "targetAbi": "10.9.0.0",
+    "targetAbi": "10.11.0.0",
     "sourceUrl": "$SOURCE_URL",
     "checksum": "$MD5",
     "timestamp": "$TIMESTAMP",
