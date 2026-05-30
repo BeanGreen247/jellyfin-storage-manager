@@ -135,9 +135,7 @@ This is the easiest method for end users. The plugin is distributed through a pu
 | Field | Value |
 |---|---|
 | Repository Name | Storage Manager |
-| Repository URL | `https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/jellyfin-storage-manager/main/manifest.json` |
-
-> Replace `YOUR_GITHUB_USERNAME` with the actual GitHub username where the repo is hosted.
+| Repository URL | `https://raw.githubusercontent.com/BeanGreen247/jellyfin-storage-manager/main/manifest.json` |
 
 4. Click **Save**
 
@@ -164,7 +162,7 @@ The repository includes a GitHub Actions release workflow at `.github/workflows/
 
 **One-time setup:**
 
-Before your first release, edit `manifest.json` and replace `YOUR_GITHUB_USERNAME` with your actual GitHub username. Commit that change to `main`.
+Before your first release, edit `manifest.json` and replace `BeanGreen247` with your actual GitHub username. Commit that change to `main`.
 
 **Releasing a new version:**
 
