@@ -29,6 +29,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CSPROJ="$SCRIPT_DIR/Jellyfin.Plugin.StorageManager.csproj"
 MANIFEST="$SCRIPT_DIR/manifest.json"
 DLL="$SCRIPT_DIR/artifacts/Jellyfin.Plugin.StorageManager.dll"
+ZIP="$SCRIPT_DIR/artifacts/Jellyfin.Plugin.StorageManager.zip"
 
 # ── 1. Stamp version into csproj ──────────────────────────────
 echo "▶  Setting version to $VERSION …"
@@ -43,11 +44,15 @@ export PATH="$HOME/.dotnet:$PATH"
 dotnet publish "$SCRIPT_DIR" --configuration Release --output "$SCRIPT_DIR/artifacts" --nologo -v quiet
 echo "✓  Build complete."
 
-# ── 3. Compute MD5 ────────────────────────────────────────────
-MD5=$(md5sum "$DLL" | awk '{print $1}')
+# ── 3. Zip the DLL (Jellyfin 10.11+ requires a zip package) ───
+(cd "$SCRIPT_DIR/artifacts" && zip -q Jellyfin.Plugin.StorageManager.zip Jellyfin.Plugin.StorageManager.dll)
+echo "✓  Packaged: $ZIP"
+
+# ── 4. Compute MD5 of the zip ─────────────────────────────────
+MD5=$(md5sum "$ZIP" | awk '{print $1}')
 echo "✓  MD5: $MD5"
 
-# ── 4. Resolve GitHub repo for sourceUrl ──────────────────────
+# ── 5. Resolve GitHub repo for sourceUrl ──────────────────────
 REMOTE=$(git -C "$SCRIPT_DIR" remote get-url origin 2>/dev/null || echo "")
 REPO=""
 if [[ "$REMOTE" =~ github\.com[:/](.+/.+?)(\.git)?$ ]]; then
@@ -58,13 +63,13 @@ if [[ -z "$REPO" ]]; then
     echo ""
     echo "⚠  Could not detect GitHub repo from git remote."
     echo "   Edit manifest.json manually and set the correct sourceUrl."
-    SOURCE_URL="https://github.com/YOUR_GITHUB_USERNAME/jellyfin-storage-manager/releases/download/v${VERSION}/Jellyfin.Plugin.StorageManager.dll"
+    SOURCE_URL="https://github.com/YOUR_GITHUB_USERNAME/jellyfin-storage-manager/releases/download/v${VERSION}/Jellyfin.Plugin.StorageManager.zip"
 else
-    SOURCE_URL="https://github.com/${REPO}/releases/download/v${VERSION}/Jellyfin.Plugin.StorageManager.dll"
+    SOURCE_URL="https://github.com/${REPO}/releases/download/v${VERSION}/Jellyfin.Plugin.StorageManager.zip"
     echo "✓  Repo: $REPO"
 fi
 
-# ── 5. Update manifest.json ────────────────────────────────────
+# ── 6. Update manifest.json ────────────────────────────────────
 echo ""
 echo "▶  Updating manifest.json …"
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%S.0000000Z")

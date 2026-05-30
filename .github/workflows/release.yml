@@ -39,11 +39,18 @@ jobs:
       - name: Build
         run: dotnet publish --configuration Release --output ./artifacts --nologo
 
-      # Jellyfin verifies the MD5 of the downloaded file before installing
+      # Jellyfin 10.11+ requires a zip archive, not a bare DLL
+      - name: Package into zip
+        run: |
+          cd artifacts
+          zip Jellyfin.Plugin.StorageManager.zip Jellyfin.Plugin.StorageManager.dll
+          cd ..
+
+      # Jellyfin verifies the MD5 of the zip before installing
       - name: Compute MD5 checksum
         id: checksum
         run: |
-          md5=$(md5sum artifacts/Jellyfin.Plugin.StorageManager.dll | awk '{print $1}')
+          md5=$(md5sum artifacts/Jellyfin.Plugin.StorageManager.zip | awk '{print $1}')
           echo "md5=$md5" >> "$GITHUB_OUTPUT"
 
       # Prepend the new version entry to manifest.json so newest is always first
@@ -51,7 +58,7 @@ jobs:
         run: |
           VERSION="${{ steps.ver.outputs.version }}"
           CHECKSUM="${{ steps.checksum.outputs.md5 }}"
-          SOURCE_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/Jellyfin.Plugin.StorageManager.dll"
+          SOURCE_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/Jellyfin.Plugin.StorageManager.zip"
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%S.0000000Z")
 
           jq \
@@ -78,9 +85,9 @@ jobs:
           git commit -m "chore: release ${{ github.ref_name }}"
           git push origin HEAD:main
 
-      # Create the GitHub Release and attach the DLL
+      # Create the GitHub Release and attach the zip
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/Jellyfin.Plugin.StorageManager.dll
+          files: artifacts/Jellyfin.Plugin.StorageManager.zip
           generate_release_notes: true
