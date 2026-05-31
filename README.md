@@ -210,6 +210,45 @@ This happens if no libraries have been set up in Jellyfin yet, or the library pa
 
 ---
 
+## Updating the plugin after code changes
+
+This is the day-to-day workflow when you edit the source and want the changes live on your Jellyfin server.
+
+### Rebuild and redeploy in one step (remote server)
+
+```bash
+cd ~/jellyfin-storage-manager
+./deploy.sh bean@<your-server-ip>
+```
+
+That's it. The script rebuilds the plugin, copies the DLL, and restarts Jellyfin.
+
+> **Note:** `dotnet` may not be on your PATH. If `./deploy.sh` says `dotnet: command not found`, prefix the build manually first:
+> ```bash
+> ~/.dotnet/dotnet publish --configuration Release --output artifacts
+> ./deploy.sh bean@<your-server-ip>
+> ```
+> Or add dotnet to your PATH permanently: `echo 'export PATH="$HOME/.dotnet:$PATH"' >> ~/.bashrc && source ~/.bashrc`
+
+### Rebuild and install locally (Jellyfin on the same machine)
+
+```bash
+cd ~/jellyfin-storage-manager
+~/.dotnet/dotnet publish --configuration Release --output artifacts
+sudo cp artifacts/Jellyfin.Plugin.StorageManager.dll /var/lib/jellyfin/plugins/StorageManager/
+sudo systemctl restart jellyfin
+```
+
+### Verify the update loaded
+
+```bash
+sudo journalctl -u jellyfin -n 50 | grep -i "storage\|plugin"
+```
+
+Look for `Loaded plugin: Storage Manager x.y.z` — if you see an error instead, check that the Jellyfin version on the server matches the `targetAbi` in `manifest.json`.
+
+---
+
 ## Publishing a release (for maintainers)
 
 This section explains how to cut a new version so the catalog manifest stays up to date.
@@ -351,6 +390,7 @@ All endpoints are under `/StorageManager` and require admin authentication.
 | `GET` | `/StorageManager/browse?path=…` | List files and folders at a path |
 | `POST` | `/StorageManager/rename` | Rename a file or folder |
 | `POST` | `/StorageManager/delete` | Delete a file or folder (password required) |
+| `POST` | `/StorageManager/upload?path=…` | Upload a file into a directory (multipart/form-data) |
 | `GET` | `/StorageManager/config` | Get current plugin configuration |
 | `POST` | `/StorageManager/config` | Save plugin configuration |
 

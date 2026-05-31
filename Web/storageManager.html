@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <title>Storage Manager</title>
-    <style>
+</head>
+<body>
+<style>
         :root {
             --bg:        #101010;
             --surface:   #1c1c1c;
@@ -299,9 +301,7 @@
             font-size: 0.85rem; font-weight: 600; text-transform: uppercase;
             letter-spacing: 0.07em; color: var(--muted); margin-bottom: 14px;
         }
-    </style>
-</head>
-<body>
+</style>
 
 <!-- Jellyfin requires this data-role="page" wrapper to register the page in its router -->
 <div id="StorageManagerPage" data-role="page" class="page libraryPage noSecondaryNavPage">
@@ -329,7 +329,7 @@
             </section>
 
             <!-- ── File browser ─────────────────────────────────────── -->
-            <section id="browser-section">
+            <section id="browser-section" style="display:none">
                 <div class="browser-header">
                     <button class="btn btn-ghost" onclick="showDrives()">← Back</button>
                     <div class="breadcrumb" id="breadcrumb"></div>
@@ -801,14 +801,14 @@ function clearAlert(id) {
 }
 
 // ================================================================
-// Boot — use Jellyfin's viewshow event so ApiClient is ready
+// Boot
 // ================================================================
+// viewshow fires when Jellyfin (re-)shows the page (e.g. back-navigation)
 document.getElementById('StorageManagerPage').addEventListener('viewshow', loadDrives);
-
-// Fallback for direct browser access during development
-if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    if (typeof ApiClient !== 'undefined') loadDrives();
-}
+// Always load on initial script execution — viewshow may have already
+// fired before the listener was registered, or Jellyfin may not dispatch
+// it on first load in all versions.
+loadDrives();
 </script>
 </body>
 </html>
