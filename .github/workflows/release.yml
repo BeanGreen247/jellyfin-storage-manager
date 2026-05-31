@@ -76,13 +76,17 @@ jobs:
             }] + .[0].versions' \
             manifest.json > manifest.tmp && mv manifest.tmp manifest.json
 
-      # Commit the updated manifest back to main so the raw GitHub URL stays current
+      # Commit the updated manifest back to main so the raw GitHub URL stays current.
+      # Rebase onto the current remote main first — main may have moved forward
+      # after the tag was pushed (e.g. a fix commit landed between tag and workflow run).
       - name: Commit manifest
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add manifest.json Jellyfin.Plugin.StorageManager.csproj
           git commit -m "chore: release ${{ github.ref_name }}"
+          git fetch origin main
+          git rebase origin/main
           git push origin HEAD:main
 
       # Create the GitHub Release and attach the zip
