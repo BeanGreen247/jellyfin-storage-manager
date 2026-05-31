@@ -56,7 +56,17 @@ public class StorageController : ControllerBase
         var drives = DriveInfo.GetDrives()
             .Where(d => d.IsReady)
             .Where(d => config.ShowNonMediaDrives || IsDriveMedia(d, mediaPaths))
-            .Select(d => MapDrive(d, mediaPaths))
+            .Select(d =>
+            {
+                try { return MapDrive(d, mediaPaths); }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Storage Manager: skipping unreadable drive {Drive}", d.Name);
+                    return null;
+                }
+            })
+            .Where(d => d is not null)
+            .Cast<DriveInfoModel>()
             .ToList();
 
         return Ok(drives);
@@ -404,13 +414,37 @@ public class StorageController : ControllerBase
 
         try
         {
-            foreach (var folder in _libraryManager.RootFolder.Children)
+            // Snapshot ready drives once so we can find the deepest mount point
+            // that contains each library path — on Linux Path.GetPathRoot() always
+            // returns "/" which doesn't identify the actual media mount (e.g. /mnt/media).
+            var readyDrives = DriveInfo.GetDrives()
+                .Where(d => d.IsReady)
+                .Select(d => d.RootDirectory.FullName)
+                .ToList();
+
+            var rootFolder = _libraryManager.RootFolder;
+            if (rootFolder is null)
+                return results;
+
+            foreach (var folder in rootFolder.Children)
             {
                 foreach (var location in folder.PhysicalLocations)
                 {
-                    var root = Path.GetPathRoot(location);
-                    if (root is not null && seen.Add(root))
-                        results.Add(Path.GetFullPath(root));
+                    try
+                    {
+                        var fullLocation = Path.GetFullPath(location);
+
+                        // Pick the most specific mount that is a prefix of this path
+                        var mountRoot = readyDrives
+                            .Where(r => fullLocation.StartsWith(r, StringComparison.OrdinalIgnoreCase))
+                            .OrderByDescending(r => r.Length)
+                            .FirstOrDefault()
+                            ?? Path.GetPathRoot(fullLocation);
+
+                        if (mountRoot is not null && seen.Add(mountRoot))
+                            results.Add(mountRoot);
+                    }
+                    catch { /* skip invalid locations */ }
                 }
             }
         }

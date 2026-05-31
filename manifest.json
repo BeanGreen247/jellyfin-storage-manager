@@ -4,7 +4,7 @@
     "guid": "2c4d6a7b-1e3f-4589-ad2c-ef0987654321",
     "name": "Storage Manager",
     "description": "Monitor disk usage and manage media drive contents from the Jellyfin dashboard.",
-    "overview": "Storage Manager lets Jellyfin admins see at a glance how much space is used on their media drive, browse the file system, rename files and folders, and safely delete content — all without leaving Jellyfin. Non-media drives (OS, cache) are visible but locked from modification.",
+    "overview": "Storage Manager lets Jellyfin admins see at a glance how much space is used on their media drive, browse the file system, rename files and folders, and safely delete content \u2014 all without leaving Jellyfin. Non-media drives (OS, cache) are visible but locked from modification.",
     "owner": "BeanGreen247",
     "versions": [
       {

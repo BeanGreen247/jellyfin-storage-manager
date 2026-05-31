@@ -251,35 +251,50 @@ Look for `Loaded plugin: Storage Manager x.y.z` — if you see an error instead,
 
 ## Publishing a release (for maintainers)
 
-This section explains how to cut a new version so the catalog manifest stays up to date.
+This is the exact sequence to commit changes, push them, cut a version tag, and get the catalog manifest updated automatically.
 
-### Using the automated workflow (recommended)
-
-The repository includes a GitHub Actions release workflow at `.github/workflows/release.yml` that handles everything automatically when you push a version tag.
-
-**Releasing a new version:**
+### Full release workflow
 
 ```bash
-git tag v1.2.0
-git push origin v1.2.0
+# 1. Stage the files you changed
+git add Web/storageManager.html README.md   # adjust to what you changed
+
+# 2. Commit
+git commit -m "fix: short description of what changed"
+
+# 3. Tag the release (bump the version number each time)
+git tag v1.0.5
+
+# 4. Pull any remote changes before pushing (the release workflow
+#    commits manifest.json back to main, so there may be commits
+#    on the remote you don't have locally)
+git pull --rebase origin main
+
+# 5. Push the branch and the tag separately
+git push origin main
+git push origin v1.0.5
 ```
 
-Pushing the tag triggers the release workflow, which:
+Pushing the tag triggers the GitHub Actions release workflow (`.github/workflows/release.yml`), which:
 1. Builds the plugin with the new version stamped in
 2. Computes the MD5 checksum Jellyfin uses for verification
 3. Prepends the new version entry to `manifest.json` and commits it back to `main`
-4. Creates a GitHub Release and attaches the DLL as a download
+4. Creates a GitHub Release and attaches the zip as a download
 
-Within a few minutes, the updated manifest URL will serve the new version and any Jellyfin instance with the repository added will show the update in **Admin → Plugins → Catalog**.
+Within a few minutes the catalog manifest is live and any Jellyfin with the repository configured will see the update under **Admin → Plugins → Catalog**.
+
+### Why `git pull --rebase` before pushing
+
+The release workflow runs on GitHub and commits `manifest.json` back to `main`. If you tagged a previous release, that commit is on the remote but not in your local repo. Without pulling first, `git push origin main` is rejected. Using `--rebase` (instead of a plain merge) keeps your local commits on top and avoids a messy merge commit in the history.
 
 ### How the manifest works
 
-`manifest.json` is a JSON file hosted at the raw GitHub URL. Jellyfin fetches it when it checks for updates. Each entry in the `versions` array tells Jellyfin:
+`manifest.json` lives at the root of the repo and is served by GitHub at the raw URL Jellyfin uses as the repository source. Each entry in its `versions` array tells Jellyfin:
 
 - Which version this is (`version`)
 - The minimum Jellyfin server version required (`targetAbi` — currently `10.11.0.0`)
-- Where to download the DLL (`sourceUrl` — points to the GitHub Release asset)
-- The MD5 of that DLL (`checksum`) so Jellyfin can verify the download before installing
+- Where to download the zip (`sourceUrl` — points to the GitHub Release asset)
+- The MD5 of that zip (`checksum`) so Jellyfin can verify the download
 
 The release workflow fills all of this in automatically. You never need to edit `manifest.json` by hand.
 
